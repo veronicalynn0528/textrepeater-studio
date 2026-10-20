@@ -1,3 +1,8 @@
+## 2026-10-20 批次28 D16 候选
+
+- 基于生产 c00a957；七页移除直接Google脚本，统一地区同意控制，原GA4 ID保留。隐私说明同步，hello@邮箱保持。
+- 静态校验7页、JS语法、安全扫描通过；DE/GB同意前和Reject后刷新/内页均0请求/0Cookie，同意后加载，撤回立即清Cookie，US默认加载。原始证据：舰队 output/2026-10-20-batch28/textrepeater-pre.json。尚未部署。
+
 ## 2026-10-19 · 第 2 批联系邮箱统一（本地，未部署）
 
 - 结果：`LOCAL_EMAIL_VERIFIED_NOT_DEPLOYED`；页面联系邮箱统一为 `hello@textrepeater.studio`。
