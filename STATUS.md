@@ -1,3 +1,10 @@
+## 2026-10-20 批次28 D16 已发布验收
+
+- 源码 `273c0dc`；Cloudflare Pages 生产部署 `9544b6a2`，项目 `text-repeater-studio`，仅一次发布。基于生产 `c00a957`，保留已上线 hello@ 联系邮箱。
+- 七页移除直接 gtag，统一地区同意横幅与即时 Cookie 清理。DE/GB 同意前、Reject 后刷新及 /privacy 均 0 统计请求和 Cookie；Allow 后 gtag + g/collect；撤回即时清空第一方统计 Cookie；US 默认加载。页面运行错误 0。
+- 原始请求/Cookie：舰队 `output/2026-10-20-batch28/textrepeater-production.json` 和 `textrepeater-production-gb.json`（英国首次 Google 响应晚于5秒，针对该证据缺口延长等待后通过；未重复发布）。静态校验、安全扫描通过。
+- 未改付款/发信/生成/邮箱路由；无需用户操作。
+
 ## 2026-10-20 批次28 D16 候选
 
 - 基于生产 c00a957；七页移除直接Google脚本，统一地区同意控制，原GA4 ID保留。隐私说明同步，hello@邮箱保持。
