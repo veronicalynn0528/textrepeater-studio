@@ -150,11 +150,62 @@
     if (status) status.textContent = 'Analytics is ' + (state === 'granted' ? 'on.' : 'off.');
     document.documentElement.style.setProperty('--consent-bar-height', open ? panel.offsetHeight + 'px' : '0px');
   }
+  function blockAnalyticsTransports() {
+    // Withdrawal-only transport guard (batch 10c): gtag.js flushes already
+    // queued hits (enhanced-measurement scroll) through sendBeacon/fetch
+    // while the page unloads for the reload, so those transports are
+    // re-routed away from analytics destinations until the document dies.
+    var blocked = function (value) {
+      try {
+        var host = new URL(String(value), location.href).hostname;
+        return /(^|\.)(google-analytics\.com|googletagmanager\.com|clarity\.ms|c\.bing\.com)$/.test(host);
+      } catch (_) { return false; }
+    };
+    try {
+      if (navigator.sendBeacon) {
+        var beacon = navigator.sendBeacon.bind(navigator);
+        navigator.sendBeacon = function (url, data) { return blocked(url) ? true : beacon(url, data); };
+      }
+    } catch (_) {}
+    try {
+      if (window.fetch) {
+        var fetchOriginal = window.fetch.bind(window);
+        window.fetch = function (input, init) {
+          var url = typeof input === 'string' || input instanceof URL ? String(input) : input && input.url;
+          return blocked(url) ? Promise.resolve(new Response(null, { status: 204 })) : fetchOriginal(input, init);
+        };
+      }
+    } catch (_) {}
+    try {
+      var xhrOpen = XMLHttpRequest.prototype.open, xhrSend = XMLHttpRequest.prototype.send;
+        XMLHttpRequest.prototype.open = function (method, url) { this.__scAnalyticsUrl = url; return xhrOpen.apply(this, arguments); };
+        XMLHttpRequest.prototype.send = function () {
+          if (blocked(this.__scAnalyticsUrl)) { try { this.abort(); } catch (_) {} return; }
+          return xhrSend.apply(this, arguments);
+        };
+    } catch (_) {}
+  }
   function choose(value) {
     if (value !== 'granted' && value !== 'denied') return;
+    var wasGranted = state === 'granted' && !!path();
     sessionChoice = {value: value, expires: Date.now() + lifetime};
     choice = sessionChoice;
     try { localStorage.setItem(key, JSON.stringify(choice)); } catch (_) {}
+    if (value === 'denied' && wasGranted) {
+      // D16 withdrawal (batch 10c): revoke in the click itself without
+      // Clarity's stop flush, then reload so hits gtag.js already queued
+      // (enhanced-measurement scroll) die with the document instead of
+      // firing ~4s later with the granted consent state.
+      try { window['ga-disable-' + config.id] = true; } catch (_) {}
+      state = 'denied';
+      tag('consent', 'update', fields('denied'));
+      clearCookies();
+      if (window.clarity) { try { window.clarity('consentv2', {analytics_Storage: 'denied', ad_Storage: 'denied'}); } catch (_) {} }
+      announce();
+      blockAnalyticsTransports();
+      location.reload();
+      return;
+    }
     consent(value);
     page(); announce();
     render(false);
