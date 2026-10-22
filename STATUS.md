@@ -1,3 +1,10 @@
+## 2026-10-23 P08-10c D16 撤回残留修复已上线
+
+- 生产源码 `9abbae6`（main，基于生产谱系 0bf5d9a 合并 task/10c 修复）；Cloudflare Pages `wrangler pages deploy`，deployment `7c7d4690`。线上 `site-consent.js` md5 `63695f8c`（边缘缓存 max-age=14400，最长 4 小时内部分访客仍拿旧版，功能正常）。
+- 问题（巡检 P1-1）：撤回时 GA4 scroll 命中以已同意状态补发 1 次。修法（与 gameuimaker 同源）：撤回点击内 ga-disable + consent denied + 删 Cookie + 不调 Clarity stop，并在 reload 前加装撤回专用传输阻断（sendBeacon/fetch/XHR 改道），再 location.reload。
+- 测试：node --check 语法校验；线上 3 连测 0 残留请求、统计 Cookie 清空、确认重载。未改七页内容、价格。
+- 证据：舰队 output/p08-10c-20261022/textrepeater-withdrawal-verify.json。
+
 ## 2026-10-20 私有源码备份
 
 - 已将 `1a2ddd8d49bb2bbd9cfc3373a3ba7f79641299b0` 同步到 `origin/fix/batch28-consent-20261020`。仅源码与记录同步，无重复部署。
