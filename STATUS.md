@@ -1,3 +1,11 @@
+## 2026-10-27 P16-175b 下线 STATUS.md 和 docs 内部文件已上线（3 条边缘缓存待 purge）
+
+- 生产源码 `d8c7d7b`（= origin/main）；Pages 直传 deployment `9b853a68`（项目 `text-repeater-studio`，13 assets）。改法：新增 `scripts/build-public.sh` 白名单（7 页 + 404.html + site-consent.js/css + robots.txt + sitemap.xml + IndexNow key）→ 只部署 `dist-public/`，不再整目录直传；新增 `404.html` 让未匹配路径返回真 404（原来是 200 + 首页内容）；`.gitignore` 加 `dist-public/`。公开页与同意脚本逐字节未改。
+- 线上复测：公开页/资源全 200；`/STATUS.md`、`/docs/PRD.md`、`/docs/上线.md`、`/docs/*`、`/docs/stitch_*/*`、`/docs/screen.png`、任意不存在路径全部 404（`output/p16-175b-20261027/live-recheck.txt`）。同意逻辑无头浏览器复测：DE 未选前 0 请求 0 Cookie、Accept 后加载、Reject 后刷新与内页 0 请求；本机 US 出口 granted + 面板隐藏。`site-consent.js` md5 `63695f8c4c781e695e7e7f93c6cdd5d9` 未变。
+- 回滚点：上一版部署 `9dad5e11`（源码 `7a6f964`）。
+- **待 Veronica（阻塞项）**：`/STATUS.md`、`/docs/PRD.md`、`/docs/上线.md` 这 3 条仍被 zone 级 `*.md` 缓存规则（s-maxage=604800 + X-Robots-Tag: noindex）返回部署前的旧副本（`age≈900`，带 `?v=1` 即 404）。需在 Cloudflare 后台 Purge 这 3 条 URL，并删掉那条 `*.md` 缓存规则，否则同类泄漏会再被粘 7 天。本机 CF token 无 purge 权限。
+- 顺手修掉的旧待办：② 整目录直传泄漏已解决；任意路径软 404 已变成真 404。① GSC 只读 token 未变。
+
 ## 2026-10-27 P16-175 法务页去掉 noindex 已上线
 
 - 生产源码 `045f09a`（main = origin/main，基于 `253f91d` 只删两行）；Cloudflare Pages 直传 deployment `9dad5e11`（项目 `text-repeater-studio`，37 个 asset 里只有 `privacy.html`、`terms.html`、`STATUS.md` 是新的，其余 33 个命中旧 hash）。
