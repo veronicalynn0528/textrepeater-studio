@@ -25,6 +25,11 @@ PUBLIC_FILES=(
 rm -rf "$OUT"
 mkdir -p "$OUT"
 
+# P16-175c: Pages Functions（内部文件返回 410 Gone）随静态资源一起上传。
+if [ -d functions ]; then
+  cp -Rp functions "$OUT/functions"
+fi
+
 for f in "${PUBLIC_FILES[@]}"; do
   if [ ! -f "$f" ]; then
     echo "missing public file: $f" >&2
@@ -33,5 +38,5 @@ for f in "${PUBLIC_FILES[@]}"; do
   cp -p "$f" "$OUT/$f"
 done
 
-echo "built $OUT with ${#PUBLIC_FILES[@]} files:"
+echo "built $OUT with ${#PUBLIC_FILES[@]} files"
 ls -1 "$OUT"
