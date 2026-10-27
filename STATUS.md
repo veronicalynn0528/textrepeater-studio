@@ -1,3 +1,13 @@
+## 2026-10-27 P16-175 法务页去掉 noindex 已上线
+
+- 生产源码 `045f09a`（main = origin/main，基于 `253f91d` 只删两行）；Cloudflare Pages 直传 deployment `9dad5e11`（项目 `text-repeater-studio`，37 个 asset 里只有 `privacy.html`、`terms.html`、`STATUS.md` 是新的，其余 33 个命中旧 hash）。
+- 改动：`privacy.html`、`terms.html` 各删 1 行 `<meta name="robots" content="noindex"/>`。原因：`sitemap.xml` 把这两页列进去了，meta 却挡收录，GSC 报「被 noindex 标记排除」；车队另外几站法律页都可索引（sawadika 4 页全收录、raindance refund 可索引），判为笔误。canonical 仍自指，未改文案/价格/同意逻辑。
+- 线上复测：`/privacy`、`/terms` 均 200，无 `meta robots`、无 `X-Robots-Tag`，自指 canonical 在，`/site-consent.js` 引用在；`site-consent.js` 线上 md5 仍为 `63695f8c`（= main），D16 未回滚（DE 同意前 0 请求 0 Cookie 且弹窗在；DE 点 Accept 后 gtag + `/g/collect` + `_ga`；US 不出弹窗直接加载）。其余 5 页 200、无 robots meta、consent 引用在。
+- IndexNow：两条 URL 提交 `api.indexnow.org` 返回 200（key `2be1c1d3…` 线上 200）。
+- 回滚点：上一版部署 `7c7d4690`（源码 `9abbae6`）；需要回退就 `git revert 045f09a` 后从 main 重新直传。
+- 本单只读排查结论（10-27 03:10 那轮，证据 `output/p16-175-20261027/REPORT.md`）：7 条 sitemap URL + 站内链接 + 16 个月曝光 URL 全部 200、可索引，无重要页 404 / robots 屏蔽 / 跳转问题。
+- 待办（低优，未做）：① 任意不存在路径返回 200 + 首页内容（Cloudflare catch-all 软 404），本单不授权处理；② 整目录直传把 `STATUS.md`、`docs/*`、`docs/stitch_text_repeater_studio/*.html`（和正式页同内容的副本）一并发布到线上，`/STATUS.md`、`/docs/PRD.md`、`/docs/上线.md` 都能直接访问到；是否收掉（只发布公开页 + `_headers` 加 noindex）要 PM/Veronica 定；③ GSC「网页索引」报告没有可用权限（只读 token、无登录态浏览器），所以没点「验证修复」，靠重抓 + IndexNow。
+
 ## 2026-10-23 P08-10c D16 撤回残留修复已上线
 
 - 生产源码 `9abbae6`（main，基于生产谱系 0bf5d9a 合并 task/10c 修复）；Cloudflare Pages `wrangler pages deploy`，deployment `7c7d4690`。线上 `site-consent.js` md5 `63695f8c`（边缘缓存 max-age=14400，最长 4 小时内部分访客仍拿旧版，功能正常）。
