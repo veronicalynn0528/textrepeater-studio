@@ -1,3 +1,13 @@
+## 2026-10-27 P16-175c 内部文件改为 410 Gone 已上线
+
+- 生产源码 `9c82f4e`（= origin/main，merge `task/175c`）；Pages 直传 deployment `67c8dea3`（项目 `text-repeater-studio`）。改法：新增 `functions/_middleware.js`（Pages Functions 中间件）——`/docs`、`/docs/*`、任意 `*.md`、`/scripts/*`、`/.gitignore` 一律返回 `410 Gone`（`content-type: text/plain`、`cache-control: no-store`、`X-Robots-Tag: noindex`），其余路径原样 `context.next()` 走静态资源；`scripts/build-public.sh` 把 `functions/` 一起放进 `dist-public/`。
+- 为什么用中间件而不是 `_worker.js`：中间件只拦内部路径，静态页和内置 404.html 行为完全不变，不必接管整个 asset 路由。
+- 线上复测（原生 curl，`~/Documents/AI-Sites-Ops/output/p16-175c-20261027/live.txt`）：`/STATUS.md`、`/docs/PRD.md`、`/docs/上线.md`、`/docs/DESIGN.md`、`/docs/code.html`、`/docs/screen.png`、`/docs/合规.md`、`/docs/关键词研究.md`、`/docs/定价.md`、`/docs/域名候选.md`、`/docs/handoffs/2026-10-19-contact-email.md`、`/docs/stitch_text_repeater_studio/index.html`、`/docs/stitch_text_repeater_studio/terms.html` **全部 410**（71B）；7 条 sitemap URL + `robots.txt`/`sitemap.xml`/`site-consent.js`/`site-consent.css`/IndexNow key **全部 200**；任意不存在路径仍 404（404.html，1248B）。
+- 上一轮遗留的 3 条边缘缓存：这次部署后 `/STATUS.md`、`/docs/PRD.md`、`/docs/上线.md` 已直接返回 410（连测 3 次均 410，`cf-cache-status: DYNAMIC`、无 `age`），**不需要 Veronica purge 了**。但 zone 里那条「`*.md` 缓存 7 天 + noindex」规则仍在（本机 token 无 zone/rulesets 权限，删不掉），建议 Veronica 有空删掉；410 响应带 `no-store`，不会再被它粘住。
+- 公开页与同意脚本逐字节未改：`site-consent.js` md5 `63695f8c4c781e695e7e7f93c6cdd5d9`、`site-consent.css` `dfad6c192c843782005e15570d1de7ed`、`robots.txt`、`sitemap.xml` 与仓库一致；`/privacy` 与页面对比只差 Cloudflare 邮箱混淆的运行时替换。中间件对非内部路径只调用 `context.next()`，静态资源路径未进入任何改写分支。
+- 回滚点：上一版生产部署 `9b853a68`（源码 `d8c7d7b`）。回退：`git revert -m 1 9c82f4e` → `./scripts/build-public.sh` → `wrangler pages deploy dist-public --project-name text-repeater-studio --branch main`。
+- 注意：本轮因外置盘 `/Volumes/Veronica Lab` 对 pi 进程只读被拒（TCC/listdir 失败），是在 `~/tmp/textrepeater-studio` 的 GitHub clone 上改的，push 到 origin/main 后外置盘那份工作副本需要 `git pull`。
+
 ## 2026-10-27 P16-175b 下线 STATUS.md 和 docs 内部文件已上线（3 条边缘缓存待 purge）
 
 - 生产源码 `d8c7d7b`（= origin/main）；Pages 直传 deployment `9b853a68`（项目 `text-repeater-studio`，13 assets）。改法：新增 `scripts/build-public.sh` 白名单（7 页 + 404.html + site-consent.js/css + robots.txt + sitemap.xml + IndexNow key）→ 只部署 `dist-public/`，不再整目录直传；新增 `404.html` 让未匹配路径返回真 404（原来是 200 + 首页内容）；`.gitignore` 加 `dist-public/`。公开页与同意脚本逐字节未改。
