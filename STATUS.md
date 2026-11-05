@@ -1,3 +1,10 @@
+## 2026-11-05 S41 GEO 补缺已上线（Claude）
+
+- 改了什么：首页加 3 步用法 + HowTo schema；写清最多 10,000 次（超出按 10,000 算）和 5 种分隔符（New Line、Space、Comma、No Separator、Custom）；FAQ 6→9 条，schema 与页面对齐（原 schema 只有 4 条）；页面日期与 sitemap lastmod 11-05；新建 /llms.txt 并加进 build-public 白名单。Title/H1 未动。
+- 生产：main `d71ef51`；Pages deployment `28e916be`；回滚点 `67c8dea3`（源码 9c82f4e）。
+- 线上：/、/llms.txt、/sitemap.xml 200；/STATUS.md、/docs/PRD.md 仍 410；未知路径 404；OAI-SearchBot UA 200；控制台无报错。IndexNow 2 条 200。
+- 下一步：等 Guard + GEO 复查。
+
 ## 2026-10-27 P16-175c 内部文件改为 410 Gone 已上线
 
 - 生产源码 `9c82f4e`（= origin/main，merge `task/175c`）；Pages 直传 deployment `67c8dea3`（项目 `text-repeater-studio`）。改法：新增 `functions/_middleware.js`（Pages Functions 中间件）——`/docs`、`/docs/*`、任意 `*.md`、`/scripts/*`、`/.gitignore` 一律返回 `410 Gone`（`content-type: text/plain`、`cache-control: no-store`、`X-Robots-Tag: noindex`），其余路径原样 `context.next()` 走静态资源；`scripts/build-public.sh` 把 `functions/` 一起放进 `dist-public/`。
