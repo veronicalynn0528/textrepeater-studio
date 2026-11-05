@@ -18,6 +18,7 @@ PUBLIC_FILES=(
   site-consent.js
   site-consent.css
   robots.txt
+  llms.txt
   sitemap.xml
   2be1c1d370264bcf8938529e2fc996aa.txt
 )

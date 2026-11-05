@@ -1,0 +1,24 @@
+# Text Repeater Studio
+
+> Free online text repeater. Repeat any text, word, emoji or sentence up to 10,000 times in your browser, with no sign up. Copy the result, download it as a .txt file or share it to WhatsApp.
+
+Last updated: 2026-11-05
+
+## Tool facts
+- Price: free, no sign up
+- Repeat count: 1 to 10,000 (higher numbers are capped at 10,000)
+- Separators: New Line, Space, Comma, No Separator, or any Custom text
+- Output: copy, download as repeated-text.txt, or share to WhatsApp
+- Privacy: the repeating runs in the browser; entered text is not sent to the server
+
+## Pages
+- [Text Repeater](https://textrepeater.studio/): repeat any text online, with how-to steps and FAQ
+- [Emoji Repeater](https://textrepeater.studio/emoji-repeater): repeat any emoji
+- [Word Repeater](https://textrepeater.studio/word-repeater): repeat words with custom separators
+- [Letter Repeater](https://textrepeater.studio/letter-repeater): repeat letters and characters
+- [WhatsApp Text Repeater](https://textrepeater.studio/whatsapp-text-repeater): repeat text for WhatsApp messages
+
+## Legal and contact
+- [Privacy Policy](https://textrepeater.studio/privacy)
+- [Terms of Service](https://textrepeater.studio/terms)
+- Contact: hello@textrepeater.studio
